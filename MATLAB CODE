@@ -1,0 +1,47 @@
+clc;
+clear;
+close all;
+
+% Select image
+[file,path] = uigetfile({'*.jpg;*.png;*.jpeg'});
+img = imread(fullfile(path,file));
+figure
+imshow(img)
+title('Original Foggy Image')
+
+% Convert to grayscale
+gray = rgb2gray(img);
+
+% Enhance image (reduce fog effect)
+enhanced = adapthisteq(gray);
+figure
+imshow(enhanced)
+title('Enhanced Image')
+
+% Detect edges
+edges = edge(enhanced,'Canny');
+ VEHICLE DETECTION DURING FOG/HAZY DAY
+MLRIT-ECE 47 2023-2027
+figure
+imshow(edges)
+title('Edge Detection')
+
+% Find connected regions
+stats = regionprops(edges,'BoundingBox','Area');
+figure
+imshow(img)
+title('Detected Vehicles')
+hold on
+
+% Loop through detected regions
+for i = 1:length(stats)
+ bb = stats(i).BoundingBox;
+ area = stats(i).Area;
+
+ % Vehicle size condition (adjust if needed)
+ if area > 200
+ rectangle('Position',bb,'EdgeColor','r','LineWidth',2);
+ text(bb(1),bb(2)-10,'Vehicle','Color','yellow','FontSize',10);
+ end
+end
+hold off
